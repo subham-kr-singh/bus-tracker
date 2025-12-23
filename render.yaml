@@ -1,0 +1,37 @@
+services:
+  # The Spring Boot Application
+  - type: web
+    name: bus-tracker-backend
+    runtime: docker
+    plan: free
+    region: singapore # Change to your preferred region
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: bus-tracker-db
+          property: connectionString
+      - key: SPRING_DATA_REDIS_HOST
+        fromService:
+          type: redis
+          name: bus-tracker-cache
+          property: host
+      - key: SPRING_DATA_REDIS_PORT
+        fromService:
+          type: redis
+          name: bus-tracker-cache
+          property: port
+      - key: JWT_SECRET
+        generateValue: true
+
+  # PostgreSQL Database
+  - type: database
+    name: bus-tracker-db
+    plan: free
+    databaseName: bus_tracker
+    user: postgres
+
+  # Redis Cache
+  - type: redis
+    name: bus-tracker-cache
+    plan: free
+    ipAllowList: [] # Only allow internal connections
