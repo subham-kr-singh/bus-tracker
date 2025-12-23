@@ -23,7 +23,11 @@ public class DailySchedule {
     @JoinColumn(name = "bus_id")
     private Bus bus;
 
+    @ManyToOne
+    @JoinColumn(name = "driver_id")
+    private User driver;
+
     private String direction; // MORNING, EVENING
     private LocalTime departureTime;
-    private String status; // SCHEDULED, RUNNING
+    private String status = "SCHEDULED";
 }

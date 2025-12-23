@@ -11,8 +11,10 @@ public class Bus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String busNumber;
-    private int capacity;
+
+    private Integer capacity;
     private String gpsDeviceId;
+    private String status = "ACTIVE";
 }

@@ -4,9 +4,11 @@ import lombok.Data;
 
 @Data
 public class MorningBusDto {
+    private Long busId;
     private String busNumber;
-    private int etaMinutes;
-    private double latitude;
-    private double longitude;
     private String routeName;
+    private Integer etaMinutes;
+    private Double latitude;
+    private Double longitude;
+    private String nextStop;
 }
