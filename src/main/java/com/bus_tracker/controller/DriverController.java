@@ -16,6 +16,9 @@ public class DriverController {
 
     @PostMapping("/location")
     public void updateLocation(@RequestBody LocationUpdateDto locationUpdate) {
-        // TODO: Implement location update logic
+        if (locationUpdate.getTimestamp() == null) {
+            locationUpdate.setTimestamp(java.time.LocalDateTime.now());
+        }
+        trackingService.updateBusLocation(locationUpdate);
     }
 }
