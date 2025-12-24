@@ -63,4 +63,11 @@ public class TrackingService {
         dto.setDirection(schedule.getDirection());
         return dto;
     }
+
+    public List<BusLocation> getAllLiveLocations() {
+        return scheduleRepository.findByDate(LocalDate.now()).stream()
+                .map(schedule -> locationService.getLatestLocation(schedule.getBus().getId()))
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 }

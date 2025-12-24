@@ -20,6 +20,7 @@ public class StudentController {
 
     private final ScheduleService scheduleService;
     private final StopService stopService;
+    private final com.bus_tracker.service.TrackingService trackingService;
 
     @GetMapping("/morning-buses")
     public List<MorningBusDto> getMorningBuses(
@@ -34,5 +35,10 @@ public class StudentController {
             @RequestParam Double lng,
             @RequestParam(defaultValue = "1000") Double radius) {
         return stopService.findNearby(lat, lng, radius);
+    }
+
+    @GetMapping("/buses/live")
+    public List<com.bus_tracker.entity.BusLocation> getLiveBuses() {
+        return trackingService.getAllLiveLocations();
     }
 }
