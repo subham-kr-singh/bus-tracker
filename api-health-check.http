@@ -1,0 +1,131 @@
+### Bus Tracker API Health Check
+### Base URL
+@baseUrl = https://bus-tracker-backend-production-1f1c.up.railway.app/api
+@token = 
+
+### ============================================
+### 1. HEALTH CHECK (No Auth Required)
+### ============================================
+
+### Test 1.1: Actuator Health Endpoint
+GET https://bus-tracker-backend-production-1f1c.up.railway.app/actuator/health
+Accept: application/json
+
+### ============================================
+### 2. AUTHENTICATION
+### ============================================
+
+### Test 2.1: Login (Save token from response)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "password123"
+}
+
+### Test 2.2: Register New User (Requires Admin Token)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "email": "testuser@example.com",
+  "passwordHash": "password123",
+  "role": "STUDENT",
+  "name": "Test User",
+  "phone": "9876543210"
+}
+
+### ============================================
+### 3. STUDENT API (Requires STUDENT Role)
+### ============================================
+
+### Test 3.1: Get Nearby Stops
+GET {{baseUrl}}/student/stops/nearby?lat=28.6139&lng=77.2090&radius=1500
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Test 3.2: Get Morning Buses
+GET {{baseUrl}}/student/morning-buses?date=2025-12-25&stopId=1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### ============================================
+### 4. DRIVER API (Requires DRIVER Role)
+### ============================================
+
+### Test 4.1: Get Today's Schedules
+GET {{baseUrl}}/driver/schedules/today
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Test 4.2: Update Bus Location
+POST {{baseUrl}}/driver/location
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "scheduleId": 1,
+  "latitude": 28.6150,
+  "longitude": 77.2080,
+  "speed": 45.5
+}
+
+### ============================================
+### 5. ADMIN API (Requires ADMIN Role)
+### ============================================
+
+### Test 5.1: Get All Buses
+GET {{baseUrl}}/admin/buses
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Test 5.2: Create Bus
+POST {{baseUrl}}/admin/buses
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "busNumber": "TEST-BUS-001",
+  "capacity": 40,
+  "gpsDeviceId": "GPS-TEST-001",
+  "status": "ACTIVE"
+}
+
+### Test 5.3: Update Schedule
+PUT {{baseUrl}}/admin/schedules/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "busId": 1
+}
+
+### ============================================
+### 6. ERROR TESTING
+### ============================================
+
+### Test 6.1: Unauthorized Access (No Token)
+GET {{baseUrl}}/admin/buses
+Accept: application/json
+
+### Test 6.2: Invalid Credentials
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "invalid@example.com",
+  "password": "wrongpassword"
+}
+
+### Test 6.3: Malformed Request
+POST {{baseUrl}}/driver/location
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "scheduleId": "invalid",
+  "latitude": "not-a-number"
+}
