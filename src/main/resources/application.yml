@@ -34,6 +34,15 @@ spring:
       host: ${REDIS_HOST:boss-bengal-50523.upstash.io}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:AcVbAAIncDE2NGUyZjU4ZmVlMTM0MTJmOTc5YzYyYmQ1YzJkY2ZhZHAxNTA1MjM=}
+      timeout: 5000
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  health:
+    redis:
+      enabled: false
 
 jwt:
   secret: ${JWT_SECRET:your-super-secret-jwt-key-here-make-it-32-characters-long-at-least}
