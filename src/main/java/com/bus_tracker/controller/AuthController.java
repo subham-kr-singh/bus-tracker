@@ -25,8 +25,10 @@ public class AuthController {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // In production, use passwordEncoder.matches(request.getPassword(),
-        // user.getPasswordHash())
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            throw new RuntimeException("Invalid credentials");
+        }
+
         String token = jwtService.generateToken(user);
 
         return ResponseEntity.ok(new LoginResponse(token, user.getRole()));
