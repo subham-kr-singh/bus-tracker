@@ -16,6 +16,9 @@ spring:
   data:
     redis:
       url: ${SPRING_DATA_REDIS_URL:redis://default:AcVbAAIncDE2NGUyZjU4ZmVlMTM0MTJmOTc5YzYyYmQ1YzJkY2ZhZHAxNTA1MjM@boss-bengal-50523.upstash.io:6379}
+      host: ${REDIS_HOST:boss-bengal-50523.upstash.io}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:AcVbAAIncDE2NGUyZjU4ZmVlMTM0MTJmOTc5YzYyYmQ1YzJkY2ZhZHAxNTA1MjM=}
 
 jwt:
   secret: ${JWT_SECRET:your-super-secret-jwt-key-here-make-it-32-characters-long-at-least}
