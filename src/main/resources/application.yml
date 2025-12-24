@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: "jdbc:postgresql://db.herratmohdcmsyhgimpl.supabase.co:5432/postgres?sslmode=require"
-    username: "postgres"
-    password: "@Shubhamkr077"
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://db.herratmohdcmsyhgimpl.supabase.co:5432/postgres?sslmode=require}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:@Shubhamkr077}
     driver-class-name: org.postgresql.Driver
   
   jpa:
@@ -15,14 +15,14 @@ spring:
 
   data:
     redis:
-      url: redis://default:AcVbAAIncDE2NGUyZjU4ZmVlMTM0MTJmOTc5YzYyYmQ1YzJkY2ZhZHAxNTA1MjM@boss-bengal-50523.upstash.io:6379
+      url: ${SPRING_DATA_REDIS_URL:redis://default:AcVbAAIncDE2NGUyZjU4ZmVlMTM0MTJmOTc5YzYyYmQ1YzJkY2ZhZHAxNTA1MjM@boss-bengal-50523.upstash.io:6379}
 
 jwt:
-  secret: your-super-secret-jwt-key-here-make-it-32-characters-long-at-least
-  expiration: 86400000
+  secret: ${JWT_SECRET:your-super-secret-jwt-key-here-make-it-32-characters-long-at-least}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 springdoc:
   swagger-ui:
