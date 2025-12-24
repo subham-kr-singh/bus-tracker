@@ -1,242 +1,100 @@
-# Bus Tracker Backend API Integration Guide
+# Bus Tracker Integration Guide: 3-App Architecture
 
-This guide provides detailed instructions on how to integrate with the Bus Tracker backend API hosted on Railway.
+This guide structures the integration for three separate front-end applications sharing the same Spring Boot backend.
 
 **Base URL:** `https://bus-tracker-backend-production-1f1c.up.railway.app`
 **WebSocket URL:** `wss://bus-tracker-backend-production-1f1c.up.railway.app/ws`
 
-## Authentication
+---
 
-The API uses JWT (JSON Web Token) for authentication. All protected endpoints typically require the `Authorization` header.
+## 📱 1. Student App (Passenger)
+**Target Users:** Students/Parents requiring bus location and ETA.
 
-**Header Format:** 
-`Authorization: Bearer <your_jwt_token>`
+### **Core Flow**
+1.  **Login:** User logs in (`POST /api/auth/login`) -> Validates role `STUDENT`.
+2.  **Home/Map:**
+    *   **Nearby Stops:** Call `GET /api/student/stops/nearby?lat={lat}&lng={lng}` to show stops around the user.
+    *   **Select Stop:** User picks a stop to see incoming buses.
+3.  **Bus Tracking:**
+    *   **Get Buses:** Call `GET /api/student/morning-buses?stopId={id}&date={today}` to list buses headed to that stop.
+    *   **Live Updates:** Connect to WebSocket `.../ws` and subscribe to `/topic/bus/{busId}` for the selected bus. Update map marker in real-time.
 
-### 1. Login
-**Endpoint:** `POST /api/auth/login`
-**Public Access:** Yes
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "yourpassword"
-}
-```
-
-**Response:**
-```json
-{
-  "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
-  "role": "ADMIN" // or "DRIVER", "STUDENT"
-}
-```
-*Note: Store the `accessToken` and `role` securely on the client side.*
-
-### 2. Register (Admin Only)
-**Endpoint:** `POST /api/auth/register`
-**Role Required:** `ADMIN`
-
-**Request Body:**
-```json
-{
-  "email": "newuser@example.com",
-  "passwordHash": "securepassword", 
-  "role": "STUDENT", 
-  "name": "John Doe",
-  "phone": "1234567890"
-}
-```
-*Note: `passwordHash` in request is the raw password; backend will hash it.*
+### **API Endpoints (Student)**
+| Method | Endpoint | Purpose | Params |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/api/auth/login` | Login | `{email, password}` |
+| **GET** | `/api/student/stops/nearby` | Find stops | `lat`, `lng`, `radius` |
+| **GET** | `/api/student/morning-buses` | List buses for stop | `date`, `stopId` |
 
 ---
 
-## Student API
-**Role Required:** `STUDENT`
+## 🚐 2. Driver App
+**Target Users:** Bus Drivers needing to broadcast location and view schedule.
 
-### 1. Get Nearby Stops
-**Endpoint:** `GET /api/student/stops/nearby`
+### **Core Flow**
+1.  **Login:** User logs in (`POST /api/auth/login`) -> Validates role `DRIVER`.
+2.  **Dashboard:**
+    *   **My Schedule:** Call `GET /api/driver/schedules/today` to see assigned route/bus.
+3.  **Active Trip:**
+    *   **Start Trip:** Driver selects a schedule.
+    *   **Location Broadcast:** App runs a background service/loop updating GPS every 5-10s via `POST /api/driver/location`.
 
-**Query Parameters:**
-* `lat`: Current latitude (Double)
-* `lng`: Current longitude (Double)
-* `radius`: Search radius in meters (Double, default: 1000)
-
-**Request Example:**
-`/api/student/stops/nearby?lat=28.6139&lng=77.2090&radius=1500`
-
-**Response:**
-```json
-[
-  {
-    "id": 1,
-    "name": "Main Gate",
-    "latitude": 28.6145,
-    "longitude": 77.2095,
-    "distance": 150.5
-  },
-  ...
-]
-```
-
-### 2. Get Morning Buses for a Stop
-**Endpoint:** `GET /api/student/morning-buses`
-
-**Query Parameters:**
-* `date`: Date in ISO format (YYYY-MM-DD)
-* `stopId`: ID of the bus stop (Long)
-
-**Request Example:**
-`/api/student/morning-buses?date=2025-12-25&stopId=1`
-
-**Response:**
-```json
-[
-  {
-    "busId": 101,
-    "busNumber": "DL-1PC-1234",
-    "routeName": "Route A",
-    "etaMinutes": 12,
-    "latitude": 28.6100,
-    "longitude": 77.2000
-  },
-  ...
-]
-```
+### **API Endpoints (Driver)**
+| Method | Endpoint | Purpose | Params |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/api/auth/login` | Login | `{email, password}` |
+| **GET** | `/api/driver/schedules/today` | Get assigned trip | None (uses token) |
+| **POST** | `/api/driver/location` | **Broadcast GPS** | `{scheduleId, lat, lng, speed}` |
 
 ---
 
-## Driver API
-**Role Required:** `DRIVER`
+## 💻 3. Admin Dashboard (Web/App)
+**Target Users:** Transport Managers managing fleet, routes, and assignments.
 
-### 1. Get Today's Schedules
-**Endpoint:** `GET /api/driver/schedules/today`
+### **Core Flow**
+1.  **Login:** User logs in (`POST /api/auth/login`) -> Validates role `ADMIN`.
+2.  **Fleet Management:**
+    *   **View All:** Call `GET /api/admin/buses` to list all buses and status.
+    *   **Add Bus:** Call `POST /api/admin/buses` to register new vehicles.
+3.  **Route/Schedule Ops:**
+    *   **Assign Bus:** Call `PUT /api/admin/schedules/{id}` to swap a bus (e.g., breakdown replacement).
+4.  **Register Users (Optional):**
+    *   **Add Users:** Call `POST /api/auth/register` to create accounts for Students or Drivers.
 
-**Response:**
-```json
-[
-  {
-    "id": 501,
-    "busNumber": "DL-1PC-1234",
-    "routeName": "Route A",
-    "direction": "MORNING"
-  }
-]
-```
-
-### 2. Update Bus Location
-**Endpoint:** `POST /api/driver/location`
-
-**Request Body:**
-```json
-{
-  "scheduleId": 501,
-  "latitude": 28.6150,
-  "longitude": 77.2080,
-  "speed": 45.5
-}
-```
-
-**Response:** `200 OK` ("Location updated")
+### **API Endpoints (Admin)**
+| Method | Endpoint | Purpose | Params |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/api/auth/login` | Login | `{email, password}` |
+| **POST** | `/api/auth/register` | Create New User | `{email, role, ...}` |
+| **GET** | `/api/admin/buses` | List all buses | None |
+| **POST** | `/api/admin/buses` | Add new bus | `{busNumber, capacity, ...}` |
+| **PUT** | `/api/admin/schedules/{id}` | Assign Bus to Schedule | `{busId}` |
 
 ---
 
-## Admin API
-**Role Required:** `ADMIN`
+## 📡 WebSocket Integration (Real-Time)
+**Used By:** Student App (Receive), Admin Dashboard (Monitor).
 
-### 1. Get All Buses
-**Endpoint:** `GET /api/admin/buses`
-
-**Response:**
-```json
-[
-  {
-    "id": 101,
-    "busNumber": "DL-1PC-1234",
-    "capacity": 50,
-    "gpsDeviceId": "GPS-001",
-    "status": "ACTIVE"
-  }
-]
-```
-
-### 2. Create Bus
-**Endpoint:** `POST /api/admin/buses`
-
-**Request Body:**
-```json
-{
-  "busNumber": "DL-1PC-5678",
-  "capacity": 40,
-  "gpsDeviceId": "GPS-002",
-  "status": "MAINTENANCE"
-}
-```
-
-### 3. Update Daily Schedule (Assign Bus)
-**Endpoint:** `PUT /api/admin/schedules/{id}`
-**Path Variable:** `id` (Schedule ID)
-
-**Request Body:**
-```json
-{
-  "busId": 105
-}
-```
-
----
-
-## Real-time Updates (WebSocket)
-
-The application uses STOMP over WebSocket for real-time bus location updates.
-
-1.  **Connect:**
-    Connect to `wss://bus-tracker-backend-production-1f1c.up.railway.app/ws`
-
-2.  **Subscribe:**
-    Subscribe to `/topic/bus/{busId}` to receive location updates for a specific bus.
-
-    **Example:** `/topic/bus/101`
-
-3.  **Incoming Message Format:**
-    The payload received on the subscribed topic will be a JSON string matching the `LocationUpdateDto`, often simplified or mapped directly from the driver's update payload.
-
-    ```json
-    {
-      "scheduleId": 501,
-      "latitude": 28.6155,
-      "longitude": 77.2085,
-      "speed": 48.0
-    }
+1.  **Library:** Use a STOMP client (e.g., `@stomp/stompjs` for React/React Native).
+2.  **Connection:**
+    ```javascript
+    const client = new Client({
+      brokerURL: 'wss://bus-tracker-backend-production-1f1c.up.railway.app/ws',
+      onConnect: () => {
+        // Subscribe to specific bus
+        client.subscribe('/topic/bus/101', message => {
+          const location = JSON.parse(message.body);
+          console.log(`Bus 101 is at: ${location.latitude}, ${location.longitude}`);
+        });
+      }
+    });
+    client.activate();
     ```
 
 ---
 
-## Application Structure & Flow
-
-1.  **Authentication Flow:**
-    *   User logs in via `/api/auth/login`.
-    *   Client receives JWT and role.
-    *   Client stores JWT and restricts UI based on role.
-
-2.  **Student Flow:**
-    *   Student uses GPS to find nearby stops (`/api/student/stops/nearby`).
-    *   Selects a stop and views incoming buses (`/api/student/morning-buses`).
-    *   App connects to WebSocket `/topic/bus/{busId}` for the selected bus to show live movement on a map.
-
-3.  **Driver Flow:**
-    *   Driver logs in and sees their schedule (`/api/driver/schedules/today`).
-    *   Driver starts a trip.
-    *   Phone's GPS periodically (e.g., every 5-10s) sends updates to `/api/driver/location`.
-
-4.  **Admin Flow:**
-    *   Admin manages buses, routes, and daily schedules via the Admin API.
-    *   Can re-assign buses to schedules dynamically if a bus breaks down.
-
-## Error Handling
-Standard HTTP status codes are used:
-*   `200 OK`: Success
-*   `401 Unauthorized`: Invalid or missing token
-*   `403 Forbidden`: Insufficient permissions (role mismatch)
-*   `404 Not Found`: Resource not found
-*   `500 Internal Server Error`: Server-side processing error (check server logs)
+## 🔒 Security Best Practices
+*   **JWT Storage:**
+    *   **Web (Admin):** Store in `HttpOnly` cookies (if possible) or `localStorage`.
+    *   **Mobile (Student/Driver):** Store in `SecureStore` (Expo) or `Keychain` (React Native CLI).
+*   **Token Expiry:** Handle `401 Unauthorized` by redirecting to Login screen.
