@@ -8,4 +8,5 @@ public class LocationUpdateDto {
     private Double latitude;
     private Double longitude;
     private Double speed;
+    private String busNumber;
 }

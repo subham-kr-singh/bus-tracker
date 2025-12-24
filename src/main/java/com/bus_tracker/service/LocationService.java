@@ -25,7 +25,7 @@ public class LocationService {
     private static final String LOCATION_GAME_KEY = "bus:location:%d";
     private static final String GEO_KEY = "buses:geo";
 
-    public void updateLocation(Long busId, Double lat, Double lng, Double speed) {
+    public BusLocation updateLocation(Long busId, Double lat, Double lng, Double speed) {
         if (busId == null || lat == null || lng == null) {
             throw new IllegalArgumentException("busId, latitude, and longitude cannot be null");
         }
@@ -44,6 +44,8 @@ public class LocationService {
         // 2. Store Geospatial data (Geo operation)
         String busIdStr = busId.toString();
         redisTemplate.opsForGeo().add(GEO_KEY, new Point(lng, lat), busIdStr);
+
+        return location;
     }
 
     public BusLocation getLatestLocation(Long busId) {

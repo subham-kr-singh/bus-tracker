@@ -4,7 +4,7 @@
         "buildCommand": "mvn clean package -DskipTests"
     },
     "deploy": {
-        "startCommand": "java -Xmx256m -Xss512k -XX:+UseSerialGC -jar target/*.jar",
+        "startCommand": "java -Xmx200m -Xms128m -Xss256k -XX:+UseSerialGC -XX:MaxMetaspaceSize=128m -XX:CompressedClassSpaceSize=32m -XX:ReservedCodeCacheSize=32m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Xshare:auto -XX:+UseStringDeduplication -Djava.awt.headless=true -Dspring.backgroundpreinitializer.ignore=true -jar target/*.jar",
         "restartPolicyType": "ON_FAILURE",
         "restartPolicyMaxRetries": 5
     }

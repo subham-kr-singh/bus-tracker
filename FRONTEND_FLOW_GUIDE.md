@@ -22,7 +22,7 @@ We recommend a mono-repo style or 3 separate repos, but sharing a common interna
   │     └── AuthNavigator.js
   ├── /screens                 # Application Screens
   ├── /utils
-  │     ├── socket.js          # WebSocket Logic
+  │     ├── socket.js          # WebSocket Logic    
   │     └── constants.js       # Config values
   └── App.js                   # Entry Point
 ```

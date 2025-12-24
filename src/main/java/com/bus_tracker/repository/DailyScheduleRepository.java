@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface DailyScheduleRepository extends JpaRepository<DailySchedule, Long> {
     List<DailySchedule> findByDateAndDirection(LocalDate date, String direction);
+
+    List<DailySchedule> findByDate(LocalDate date);
 }

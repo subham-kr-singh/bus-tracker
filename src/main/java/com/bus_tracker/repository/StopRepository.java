@@ -18,16 +18,16 @@ public interface StopRepository extends JpaRepository<Stop, Long> {
      * Simplified SQL version for "nearest 10":
      */
     @Query(value = """
-            SELECT * FROM stops
-            ORDER BY (
-                6371 * acos(
-                    cos(radians(?1)) * cos(radians(latitude)) *
-                    cos(radians(longitude) - radians(?2)) +
-                    sin(radians(?1)) * sin(radians(latitude))
-                )
-            ) ASC
-            LIMIT 10
-            """, nativeQuery = true)
+        SELECT * FROM stops 
+        ORDER BY (
+            6371 * acos(
+                cos(radians(?1)) * cos(radians(latitude)) * 
+                cos(radians(longitude) - radians(?2)) + 
+                sin(radians(?1)) * sin(radians(latitude))
+            )
+        ) ASC 
+        LIMIT 10
+        """, nativeQuery = true)
     // @Cacheable("nearbyStops") // TODO: Enable cache manager
     List<Stop> findNearby(Double lat, Double lng);
 }
