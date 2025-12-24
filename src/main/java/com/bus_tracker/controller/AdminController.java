@@ -32,8 +32,7 @@ public class AdminController {
 
     @PutMapping("/schedules/{id}")
     public ResponseEntity<?> updateSchedule(@PathVariable Long id, @RequestBody UpdateScheduleDto dto) {
-        // Implementation of updateBusAssignment is needed in ScheduleService
-        // For now, returning OK
+        scheduleService.updateBusAssignment(id, dto.getBusId());
         return ResponseEntity.ok().build();
     }
 }

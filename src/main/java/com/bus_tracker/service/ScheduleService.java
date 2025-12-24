@@ -16,8 +16,16 @@ public class ScheduleService {
 
     private final DailyScheduleRepository scheduleRepository;
     private final RouteStopRepository routeStopRepository;
-    private final BusRepository busRepository;
     private final LocationService locationService;
+
+    public void updateBusAssignment(Long scheduleId, Long busId) {
+        DailySchedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new RuntimeException("Schedule not found"));
+        Bus bus = new Bus();
+        bus.setId(busId);
+        schedule.setBus(bus);
+        scheduleRepository.save(schedule);
+    }
 
     public List<MorningBusDto> getMorningBuses(LocalDate date, Long stopId) {
         List<DailySchedule> schedules = scheduleRepository
