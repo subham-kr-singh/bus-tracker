@@ -54,12 +54,12 @@ This guide structures the integration for three separate front-end applications 
 ### **Core Flow**
 1.  **Login:** User logs in (`POST /api/auth/login`) -> Validates role `ADMIN`.
 2.  **Fleet Management:**
-    *   **View All:** Call `GET /api/admin/buses` to list all buses and status.
-    *   **Add Bus:** Call `POST /api/admin/buses` to register new vehicles.
-3.  **Route/Schedule Ops:**
-    *   **Assign Bus:** Call `PUT /api/admin/schedules/{id}` to swap a bus (e.g., breakdown replacement).
+    *   **Manage Buses:** List, Add, or Remove buses using `/api/admin/buses`.
+3.  **Route & Schedule Management:**
+    *   **Create Route:** Define a new path for buses (`POST /api/admin/routes`).
+    *   **Assign Bus:** Assign a bus to a route for a specific time (`POST /api/admin/schedules`).
 4.  **Register Users (Optional):**
-    *   **Add Users:** Call `POST /api/auth/register` to create accounts for Students or Drivers.
+    *   **Add Users:** Call `POST /api/auth/register` to create accounts.
 
 ### **API Endpoints (Admin)**
 | Method | Endpoint | Purpose | Params |
@@ -68,7 +68,9 @@ This guide structures the integration for three separate front-end applications 
 | **POST** | `/api/auth/register` | Create New User | `{email, role, ...}` |
 | **GET** | `/api/admin/buses` | List all buses | None |
 | **POST** | `/api/admin/buses` | Add new bus | `{busNumber, capacity, ...}` |
-| **PUT** | `/api/admin/schedules/{id}` | Assign Bus to Schedule | `{busId}` |
+| **POST** | `/api/admin/routes` | **Create Route** | `{name, direction, stops: [...]}` |
+| **POST** | `/api/admin/schedules` | **Assign Bus to Route** | `{routeId, busId, departureTime, ...}` |
+| **PUT** | `/api/admin/schedules/{id}` | Update Schedule | `{busId}` |
 
 ---
 

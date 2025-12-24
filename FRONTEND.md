@@ -166,12 +166,41 @@ npx expo start
 *   Scan the QR code with **Expo Go** (Android) or Camera (iOS).
 *   Ensure your phone has internet access to reach the Railway backend.
 
-## ⚠️ Troubleshooting Common Issues
+## 4. Implementation (Unified App Architecture)
 
-*   **Network Error / Connection Refused**:
-    *   The Railway URL uses HTTPS/WSS. React Native handles this well, but ensure you aren't trying to connect to `http://localhost`. Localhost won't work on a physical device.
-*   **WebSocket Disconnects**:
-    *   Add heartbeat configurations in StompJS.
-    *   Handle `reconnect` logic in your `socket.js` utility.
-*   **Permission Denied (Location)**:
-    *   Ensure you add permission requests in `app.json` or ask user for permission via `Location.requestForegroundPermissionsAsync()`.
+This project uses a **Single App** approach. The user logs in once, and the app adapts its interface based on the assigned role (`ADMIN`, `DRIVER`, `STUDENT`).
+
+### 📱 A. Navigation & Role-Based Flow
+1.  **Auth Stack**: Login / Register screens.
+2.  **Main Navigator**: Rips out the navigation stack based on role:
+    *   **Admin**: `AdminNavigator` (Dashboard, Manage Routes, Assign Buses).
+    *   **Driver**: `DriverNavigator` (My Schedule, Active Tracking).
+    *   **Student**: `StudentNavigator` (Select Stop, Map View, Bus List).
+
+### 🛠️ B. Admin Panel Features
+**Goal**: Complete system control.
+1.  **Manage Routes**:
+    *   **Create Route**: Feature to define a new route (Start Point -> End Point, Stops).
+    *   **API**: `POST /api/admin/routes` (To be implemented).
+2.  **Assign Buses**:
+    *   **Flow**: Select a Route -> Select a Time/Shift -> Select a Bus -> Assign.
+    *   **API**: `POST /api/admin/schedules`.
+3.  **Fleet Overview**: List all buses and their current status (Active/Idle).
+
+### 🚐 C. Driver Panel Features
+**Goal**: Simple, one-tap tracking.
+1.  **Job Card**: Shows the currently assigned route and bus (e.g., "Bus MP04 3723 - Morning Route").
+2.  **Start Trip**:
+    *   Driver enters/confirms Bus Number (e.g., "MP04 3723").
+    *   Clicks "Start Tracking".
+3.  **Broadcasting**:
+    *   App sends GPS updates every 5s to `POST /api/driver/location`.
+
+### 🎓 D. Student Panel Features
+**Goal**: Find my bus.
+1.  **Dashboard**: Shows list of active buses for the day.
+    *   Items show: `Bus Number` + `Route Name` (Destination).
+2.  **Track**:
+    *   Clicking an item opens the Map.
+    *   Subscribes to specific bus topic `/topic/bus/{busId}`.
+    *   Shows live marker movement.
