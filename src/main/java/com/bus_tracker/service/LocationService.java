@@ -8,6 +8,7 @@ import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.connection.RedisGeoCommands.DistanceUnit;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,6 +26,10 @@ public class LocationService {
     private static final String GEO_KEY = "buses:geo";
 
     public void updateLocation(Long busId, Double lat, Double lng, Double speed) {
+        if (busId == null || lat == null || lng == null) {
+            throw new IllegalArgumentException("busId, latitude, and longitude cannot be null");
+        }
+
         BusLocation location = new BusLocation();
         location.setBusId(busId);
         location.setLatitude(lat);
@@ -37,13 +42,17 @@ public class LocationService {
         redisTemplate.opsForValue().set(key, location, 5, TimeUnit.MINUTES);
 
         // 2. Store Geospatial data (Geo operation)
-        redisTemplate.opsForGeo().add(GEO_KEY, new Point(lng, lat), busId.toString());
+        String busIdStr = busId.toString();
+        redisTemplate.opsForGeo().add(GEO_KEY, new Point(lng, lat), busIdStr);
     }
 
     public BusLocation getLatestLocation(Long busId) {
+        if (busId == null) {
+            return null;
+        }
         // Retrieve explicit details
-        return (BusLocation) redisTemplate.opsForValue()
-                .get(String.format(LOCATION_GAME_KEY, busId));
+        Object result = redisTemplate.opsForValue().get(String.format(LOCATION_GAME_KEY, busId));
+        return result instanceof BusLocation ? (BusLocation) result : null;
     }
 
     /**
