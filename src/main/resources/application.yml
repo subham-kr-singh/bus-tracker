@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:testdb}
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
     username: ${SPRING_DATASOURCE_USERNAME:sa}
     password: ${SPRING_DATASOURCE_PASSWORD:}
     driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.h2.Driver}
@@ -10,10 +10,14 @@ spring:
       connection-timeout: 30000
       max-lifetime: 1800000
   
+  sql:
+    init:
+      mode: ${SPRING_SQL_INIT_MODE:never}
+
   jpa:
     hibernate:
       ddl-auto: ${DDL_AUTO:create-drop}
-    show-sql: false
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
