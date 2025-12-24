@@ -1,0 +1,6 @@
+##
+POST /api/auth/login → {"email":"admin@test.com","password":"any"}
+##
+GET /api/admin/buses → List buses
+##
+GET /api/student/morning-buses?date=2025-12-24&stopId=1
