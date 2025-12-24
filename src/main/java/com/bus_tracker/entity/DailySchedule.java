@@ -2,6 +2,7 @@ package com.bus_tracker.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -27,7 +28,7 @@ public class DailySchedule {
     @JoinColumn(name = "driver_id")
     private User driver;
 
-    private String direction; // MORNING, EVENING
+    private String direction;
     private LocalTime departureTime;
-    private String status = "SCHEDULED";
+    private String status;
 }

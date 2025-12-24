@@ -16,5 +16,5 @@ public class Bus {
 
     private Integer capacity;
     private String gpsDeviceId;
-    private String status = "ACTIVE";
+    private String status;
 }

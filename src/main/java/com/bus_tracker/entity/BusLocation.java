@@ -2,6 +2,7 @@ package com.bus_tracker.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,6 +16,5 @@ public class BusLocation {
     private Double longitude;
     private Double speed;
     private Double heading;
-
     private LocalDateTime lastUpdatedAt;
 }

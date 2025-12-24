@@ -21,10 +21,7 @@ public class User implements UserDetails {
     private String email;
 
     private String passwordHash;
-
-    @Column(nullable = false)
-    private String role; // STUDENT, ADMIN, DRIVER
-
+    private String role;
     private String name;
     private String phone;
 

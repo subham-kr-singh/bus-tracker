@@ -10,5 +10,4 @@ public class MorningBusDto {
     private Integer etaMinutes;
     private Double latitude;
     private Double longitude;
-    private String nextStop;
 }

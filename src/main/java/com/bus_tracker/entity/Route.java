@@ -11,8 +11,6 @@ public class Route {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String name;
-
-    private String direction; // MORNING, EVENING, BOTH
+    private String direction;
 }
