@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db.herratmohdcmsyhgimpl.supabase.co:5432/postgres
+    url: jdbc:postgresql://db.herratmohdcmsyhgimpl.supabase.co:5432/postgres?sslmode=require
     username: postgres
-    password: "@Subhamkr077"
+    password: "@Shubhamkr077"
     driver-class-name: org.postgresql.Driver
   
   jpa:
@@ -13,9 +13,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-  redis:
-    host: localhost
-    port: 6379
+  data:
+    redis:
+      url: redis://default:AcVbAAIncDE2NGUyZjU4ZmVlMTM0MTJmOTc5YzYyYmQ1YzJkY2ZhZHAxNTA1MjM@boss-bengal-50523.upstash.io:6379
 
 jwt:
   secret: your-super-secret-jwt-key-here-make-it-32-characters-long-at-least
@@ -27,3 +27,8 @@ server:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+logging:
+  level:
+    org.hibernate.engine.jdbc.env.internal.LobCreatorBuilderImpl: ERROR
+    org.springframework.jdbc: DEBUG
