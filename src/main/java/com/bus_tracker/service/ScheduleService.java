@@ -27,6 +27,24 @@ public class ScheduleService {
         scheduleRepository.save(schedule);
     }
 
+    public void createSchedule(Long routeId, Long busId, String direction) {
+        DailySchedule schedule = new DailySchedule();
+
+        Route route = new Route();
+        route.setId(routeId);
+        schedule.setRoute(route);
+
+        Bus bus = new Bus();
+        bus.setId(busId);
+        schedule.setBus(bus);
+
+        schedule.setDate(LocalDate.now());
+        schedule.setDirection(direction); // "OUTBOUND" or "INBOUND"
+        schedule.setStartTime("08:00 AM"); // Default for now
+
+        scheduleRepository.save(schedule);
+    }
+
     public List<MorningBusDto> getMorningBuses(LocalDate date, Long stopId) {
         List<DailySchedule> schedules = scheduleRepository
                 .findByDateAndDirection(date, "MORNING");
