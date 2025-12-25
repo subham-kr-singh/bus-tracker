@@ -36,6 +36,8 @@ public class TrackingService {
         if (dto.getScheduleId() != null) {
             DailySchedule schedule = scheduleRepository.findById(dto.getScheduleId())
                     .orElseThrow(() -> new RuntimeException("Schedule not found"));
+            if (schedule.getBus() == null)
+                throw new RuntimeException("Schedule has no bus assigned");
             busId = schedule.getBus().getId();
         } else if (dto.getBusNumber() != null) {
             Bus bus = busRepository.findByBusNumber(dto.getBusNumber())
@@ -44,6 +46,9 @@ public class TrackingService {
         } else {
             throw new IllegalArgumentException("Either scheduleId or busNumber must be provided");
         }
+
+        if (busId == null)
+            throw new RuntimeException("Bus ID is null");
 
         BusLocation updatedLocation = locationService.updateLocation(
                 busId,
@@ -58,8 +63,12 @@ public class TrackingService {
     private TodayScheduleDto toTodayScheduleDto(DailySchedule schedule) {
         TodayScheduleDto dto = new TodayScheduleDto();
         dto.setId(schedule.getId());
-        dto.setBusNumber(schedule.getBus().getBusNumber());
-        dto.setRouteName(schedule.getRoute().getName());
+        if (schedule.getBus() != null) {
+            dto.setBusNumber(schedule.getBus().getBusNumber());
+        }
+        if (schedule.getRoute() != null) {
+            dto.setRouteName(schedule.getRoute().getName());
+        }
         dto.setDirection(schedule.getDirection());
         return dto;
     }

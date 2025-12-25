@@ -40,7 +40,7 @@ public class ScheduleService {
 
         schedule.setDate(LocalDate.now());
         schedule.setDirection(direction); // "OUTBOUND" or "INBOUND"
-        schedule.setStartTime("08:00 AM"); // Default for now
+        schedule.setDepartureTime(java.time.LocalTime.of(8, 0)); // Default for now
 
         scheduleRepository.save(schedule);
     }

@@ -9,6 +9,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.bus_tracker.entity.DailySchedule;
+import com.bus_tracker.repository.DailyScheduleRepository;
+import java.time.LocalTime;
+import java.util.List;
+
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
@@ -18,7 +23,8 @@ public class DataSeeder {
     public CommandLineRunner initData(UserRepository userRepository, PasswordEncoder passwordEncoder,
             com.bus_tracker.repository.RouteRepository routeRepository,
             com.bus_tracker.repository.BusRepository busRepository,
-            com.bus_tracker.repository.StopRepository stopRepository) {
+            com.bus_tracker.repository.StopRepository stopRepository,
+            DailyScheduleRepository dailyScheduleRepository) {
         return args -> {
             try {
                 log.info("Starting Data Seeding...");
@@ -33,6 +39,7 @@ public class DataSeeder {
                 seedRoutes(routeRepository);
                 seedBuses(busRepository);
                 seedStops(stopRepository);
+                seedSchedules(dailyScheduleRepository, routeRepository, busRepository);
 
                 log.info("Data Seeding Completed.");
             } catch (Exception e) {
@@ -114,6 +121,41 @@ public class DataSeeder {
         s.setLatitude(lat);
         s.setLongitude(lng);
         return s;
+    }
+
+    private void seedSchedules(DailyScheduleRepository scheduleRepo,
+            com.bus_tracker.repository.RouteRepository routeRepo,
+            com.bus_tracker.repository.BusRepository busRepo) {
+        if (scheduleRepo.count() == 0) {
+            log.info("Seeding Daily Schedules...");
+            java.time.LocalDate today = java.time.LocalDate.now();
+
+            List<com.bus_tracker.entity.Route> routes = routeRepo.findAll();
+            List<com.bus_tracker.entity.Bus> buses = busRepo.findAll();
+
+            if (routes.isEmpty() || buses.isEmpty())
+                return;
+
+            // INBOUND (Incoming to College)
+            scheduleRepo.save(createSchedule(today, "INBOUND", "08:00", "SCHEDULED", routes.get(1), buses.get(0)));
+            scheduleRepo.save(createSchedule(today, "INBOUND", "08:15", "ON_ROUTE", routes.get(3), buses.get(1)));
+
+            // OUTBOUND (Outgoing from College)
+            scheduleRepo.save(createSchedule(today, "OUTBOUND", "16:30", "SCHEDULED", routes.get(0), buses.get(0)));
+            scheduleRepo.save(createSchedule(today, "OUTBOUND", "16:40", "SCHEDULED", routes.get(2), buses.get(1)));
+        }
+    }
+
+    private DailySchedule createSchedule(java.time.LocalDate date, String direction, String time, String status,
+            com.bus_tracker.entity.Route route, com.bus_tracker.entity.Bus bus) {
+        DailySchedule ds = new DailySchedule();
+        ds.setDate(date);
+        ds.setDirection(direction);
+        ds.setDepartureTime(LocalTime.parse(time));
+        ds.setStatus(status);
+        ds.setRoute(route);
+        ds.setBus(bus);
+        return ds;
     }
 
 }
