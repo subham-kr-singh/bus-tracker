@@ -5,10 +5,12 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:}
     driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.h2.Driver}
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      connection-timeout: 30000
-      max-lifetime: 1800000
+      maximum-pool-size: 3
+      minimum-idle: 1
+      connection-timeout: 20000
+      max-lifetime: 1200000
+      idle-timeout: 300000
+      leak-detection-threshold: 60000
   
   sql:
     init:
@@ -17,14 +19,18 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${DDL_AUTO:update}
-    show-sql: ${SPRING_JPA_SHOW_SQL:false}
+    show-sql: false
     properties:
       hibernate:
         format_sql: false
+        jdbc.batch_size: 20
+        order_inserts: true
+        order_updates: true
+        jdbc.fetch_size: 50
   
   h2:
     console:
-      enabled: ${SPRING_H2_CONSOLE_ENABLED:true}
+      enabled: false
 
   data:
     redis:
@@ -32,15 +38,24 @@ spring:
       host: ${REDIS_HOST:boss-bengal-50523.upstash.io}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:AcVbAAIncDE2NGUyZjU4ZmVlMTM0MTJmOTc5YzYyYmQ1YzJkY2ZhZHAxNTA1MjM=}
-      timeout: 5000
+      timeout: 3000
+      lettuce:
+        pool:
+          max-active: 3
+          max-idle: 2
+          min-idle: 1
 
 management:
   endpoint:
     health:
-      show-details: always
+      show-details: when-authorized
   health:
     redis:
       enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health,info
 
 jwt:
   secret: ${JWT_SECRET:your-super-secret-jwt-key-here-make-it-32-characters-long-at-least}
@@ -51,8 +66,14 @@ server:
   shutdown: graceful
   tomcat:
     threads:
-      max: 50
-      min-spare: 5
+      max: 20
+      min-spare: 2
+    max-connections: 100
+    accept-count: 10
+    connection-timeout: 20000
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
 
 springdoc:
   swagger-ui:
