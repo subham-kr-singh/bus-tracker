@@ -34,3 +34,7 @@ build/
 
 ### React-App ###
 /App/
+
+### Documentation - ignore all .md files except README.md ###
+*.md
+!README.md
