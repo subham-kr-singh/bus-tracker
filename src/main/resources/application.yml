@@ -32,26 +32,16 @@ spring:
     console:
       enabled: false
 
-  data:
-    redis:
-      url: ${SPRING_DATA_REDIS_URL:redis://default:AcVbAAIncDE2NGUyZjU4ZmVlMTM0MTJmOTc5YzYyYmQ1YzJkY2ZhZHAxNTA1MjM@boss-bengal-50523.upstash.io:6379}
-      host: ${REDIS_HOST:boss-bengal-50523.upstash.io}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:AcVbAAIncDE2NGUyZjU4ZmVlMTM0MTJmOTc5YzYyYmQ1YzJkY2ZhZHAxNTA1MjM=}
-      timeout: 3000
-      lettuce:
-        pool:
-          max-active: 3
-          max-idle: 2
-          min-idle: 1
+  # Redis removed for Lite Mode
+  # data:
+  #   redis: configuration removed
 
 management:
   endpoint:
     health:
       show-details: when-authorized
   health:
-    redis:
-      enabled: false
+
   endpoints:
     web:
       exposure:
